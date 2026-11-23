@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { submitToIndexNow } from "@/lib/indexnow";
+import { soumettreSitemapGoogle } from "@/lib/gsc-sitemap";
 import { SITE_URL } from "@/lib/site";
 import { translatedPathForSlug, localeListingPathsForSlug } from "@/lib/i18n";
 
@@ -80,6 +81,11 @@ export async function POST(request: NextRequest) {
   // d'avoir eu le temps de s'exécuter.
   const urls = uniques.map((p) => `${SITE_URL}${p}`);
   await submitToIndexNow(urls, SITE_URL);
+
+  // Google : re-soumission du sitemap (sites.sitemaps.submit), pour signaler
+  // les URL nouvelles ou modifiées. Inactif tant que GSC_SERVICE_ACCOUNT_JSON
+  // et GSC_SITE_URL ne sont pas définis. Non bloquant, comme IndexNow.
+  await soumettreSitemapGoogle();
 
   return NextResponse.json({ revalidated: uniques });
 }
