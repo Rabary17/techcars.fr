@@ -21,7 +21,12 @@ function toLastModified(modifiedGmt: string): string {
   return `${modifiedGmt}+00:00`;
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+// Taille d'un sitemap segmenté. Le cache de données Next refuse les réponses
+// de plus de 2 Mo (constaté au build : sitemap.xml à 2,9 Mo non mis en cache).
+// 1 000 URL restent bien en dessous.
+const URLS_PAR_SITEMAP = 1000;
+
+async function construireUrls(): Promise<MetadataRoute.Sitemap> {
   // Dégradation gracieuse (inspiré de next-wp/lib/wordpress.ts, voir
   // app/[slug]/page.tsx) : un sitemap partiel (sans la ressource en échec)
   // plutôt qu'un déploiement bloqué si WP est temporairement injoignable — il
@@ -139,4 +144,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticUrls, ...categoryUrls, ...tagUrls, ...authorUrls,
     ...pageUrls, ...postUrls, ...localeUrls,
   ];
+}
+
+// Index + sous-sitemaps (/sitemap/0.xml, /sitemap/1.xml…). /sitemap.xml reste
+// l'URL déclarée dans robots.txt et dans la Search Console : Next la sert
+// désormais comme index qui pointe vers les segments.
+export async function generateSitemaps() {
+  const urls = await construireUrls();
+  const nombre = Math.max(1, Math.ceil(urls.length / URLS_PAR_SITEMAP));
+  return Array.from({ length: nombre }, (_, id) => ({ id }));
+}
+
+export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
+  const urls = await construireUrls();
+  return urls.slice(id * URLS_PAR_SITEMAP, (id + 1) * URLS_PAR_SITEMAP);
 }
