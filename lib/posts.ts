@@ -127,14 +127,13 @@ export function getChildHubs(parentSlug: string): Hub[] {
   return getAllHubs().filter((h) => h.parentSlug === parentSlug);
 }
 
-/** Image à la une — absente (pas de repli générique) plutôt qu'une icône
- * d'image cassée pour les quelques articles sans média à la une. */
+/** Image à la une. Repli sur une image par défaut pour les articles sans média. */
 export function resolveCoverImage(item: { image?: string; imageAlt?: string; title: string }): {
   src?: string;
   alt: string;
 } {
   if (item.image) return { src: item.image, alt: item.imageAlt || item.title };
-  return { alt: item.title };
+  return { src: "/images/articles/default-actualites.svg", alt: item.title };
 }
 
 /** Extrait les FAQ "## Questions fréquentes" / "### Question" du HTML rendu —

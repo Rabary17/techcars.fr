@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Actualités automobile">
+  <rect width="1200" height="675" fill="#1f2937"/>
+  <rect x="0" y="0" width="1200" height="12" fill="#dc2626"/>
+  <text x="600" y="330" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="700" fill="#f9fafb">techcars</text>
+  <text x="600" y="410" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="36" fill="#d1d5db">Actualités automobile et mobilité</text>
+</svg>
