@@ -9,7 +9,7 @@ name: Autopilote actus techcars (statique)
 # Secrets à créer dans GitHub (Settings > Secrets and variables > Actions) :
 #   SHEETS_SERVICE_ACCOUNT_JSON  contenu complet du JSON du compte de service Google
 #                                (ce compte doit être éditeur du sheet de veille)
-#   ANTHROPIC_API_KEY            clé API Claude (tri et rédaction)
+#   CLAUDE_CODE_OAUTH_TOKEN      jeton généré avec `claude setup-token` (abonnement, comme techno-play)
 #   VEILLE_SHEET_ID (optionnel)  identifiant du sheet, valeur par défaut dans le script
 
 on:
@@ -40,10 +40,15 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Installer la CLI Claude Code (auth par abonnement, pas l'API)
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Lancer l'autopilote
         env:
           SHEETS_SERVICE_ACCOUNT_JSON: ${{ secrets.SHEETS_SERVICE_ACCOUNT_JSON }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           VEILLE_SHEET_ID: ${{ secrets.VEILLE_SHEET_ID }}
         run: |
           N="${{ github.event.inputs.n || '2' }}"

@@ -11,8 +11,9 @@
 // Variables d'environnement (secrets GitHub) :
 //   SHEETS_SERVICE_ACCOUNT_JSON  compte de service Google (éditeur du sheet)
 //   VEILLE_SHEET_ID              identifiant du sheet (défaut ci-dessous)
-//   ANTHROPIC_API_KEY            tri et rédaction (Claude)
+//   CLAUDE_CODE_OAUTH_TOKEN      tri et rédaction (CLI Claude Code, abonnement)
 
+import { spawnSync } from "node:child_process";
 import { createSign } from "node:crypto";
 import { existsSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -97,19 +98,18 @@ async function marquerStatut(jeton, ligne, texte) {
 
 // ---------- Claude (API Messages) ----------
 
-async function claude(model, system, user, maxTokens = 1500) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY || "",
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({ model, max_tokens: maxTokens, system, messages: [{ role: "user", content: user }] }),
-  });
-  if (!res.ok) throw new Error(`API Claude ${res.status} : ${(await res.text()).slice(0, 300)}`);
-  const data = await res.json();
-  return (data.content || []).map((b) => b.text || "").join("");
+async function claude(model, system, user) {
+  // Même méthode que techno-play : CLI Claude Code en mode headless, authentifiée
+  // par CLAUDE_CODE_OAUTH_TOKEN (abonnement). Pas d'appel direct à l'API payante.
+  const args = ["-p", "--restricted", "--output-format", "json", "--model", model];
+  if (system) args.push("--system-prompt", system);
+  const res = spawnSync("claude", args, { input: user, encoding: "utf8", maxBuffer: 50 * 1024 * 1024 });
+  if (res.error) throw new Error(`Échec du lancement de la CLI claude : ${res.error.message}`);
+  if (res.status !== 0) throw new Error(`claude -p a échoué (code ${res.status}) : ${res.stderr}`);
+  let data;
+  try { data = JSON.parse(res.stdout); } catch { throw new Error("sortie de claude -p non JSON"); }
+  if (data.is_error) throw new Error(`claude -p : ${data.result || "erreur inconnue"}`);
+  return String(data.result || "");
 }
 
 function extraireJson(texte) {
