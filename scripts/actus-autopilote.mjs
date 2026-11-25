@@ -35,6 +35,7 @@ const IMAGE_PAR_DEFAUT = "/images/articles/default-actualites.svg"; // si la sou
 const args = process.argv.slice(2);
 const N = Number((args.find((a) => a.startsWith("--n=")) || "--n=2").split("=")[1]);
 const DRY = args.includes("--dry-run");
+const ILLUSTRER = args.includes("--illustrer"); // illustre les articles sans vraie image, sans toucher au sheet
 
 const log = (...m) => console.log(new Date().toISOString(), ...m);
 
@@ -299,7 +300,50 @@ async function ecrireArticle(contenu, source) {
 
 // ---------- Orchestration ----------
 
+// ---------- Illustrer les articles existants sans vraie image ----------
+
+async function illustrerExistants() {
+  const dejaUtilisees = imagesDejaUtilisees();
+  let maj = 0;
+  for (const f of readdirSync(POSTS_DIR).filter((f) => f.endsWith(".md"))) {
+    const chemin = join(POSTS_DIR, f);
+    let brut = readFileSync(chemin, "utf8");
+    const img = brut.match(/^image:\s*"([^"]+)"/m);
+    if (img && img[1] !== IMAGE_PAR_DEFAUT) continue; // déjà illustré
+    const titreLigne = brut.match(/^title:\s*(".*")\s*$/m);
+    if (!titreLigne) continue;
+    const titre = JSON.parse(titreLigne[1]);
+    let requete;
+    try {
+      requete = (await claude(MODELE_TRI, "Réponds uniquement par 2 à 4 mots-clés, en français, pour chercher une photo libre illustrant ce titre d'article. Pas de nom propre, pas de ponctuation.", titre)).trim().split("\n")[0];
+    } catch (e) {
+      log(`  ${f} : requête impossible (${e.message})`);
+      continue;
+    }
+    const trouvee = await trouverImage(requete, dejaUtilisees);
+    if (!trouvee) {
+      log(`  ${f} : aucune image trouvée pour « ${requete} »`);
+      continue;
+    }
+    dejaUtilisees.add(trouvee.url);
+    const ligneImage = `image: "${trouvee.url}"`;
+    const ligneAlt = `imageAlt: ${JSON.stringify(titre)}`;
+    if (img) {
+      brut = brut.replace(/^image:.*$/m, ligneImage);
+      brut = /^imageAlt:/m.test(brut) ? brut.replace(/^imageAlt:.*$/m, ligneAlt) : brut.replace(/^(image:.*)$/m, `$1\n${ligneAlt}`);
+    } else {
+      const fin = brut.indexOf("\n---", 4);
+      brut = brut.slice(0, fin) + `\n${ligneImage}\n${ligneAlt}` + brut.slice(fin);
+    }
+    if (!DRY) writeFileSync(chemin, brut, "utf8");
+    log(`  ${f} : ${DRY ? "[dry-run] " : ""}image « ${requete} » -> ${trouvee.url}`);
+    maj++;
+  }
+  log(`\nTerminé : ${maj} article(s) illustré(s).`);
+}
+
 async function main() {
+  if (ILLUSTRER) return illustrerExistants();
   log(`Autopilote actus techcars (statique) — n=${N}${DRY ? " (dry-run)" : ""}`);
   const jeton = await jetonSheets();
   const actus = await lireActus(jeton);

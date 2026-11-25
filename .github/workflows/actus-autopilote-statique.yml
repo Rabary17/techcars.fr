@@ -25,6 +25,10 @@ on:
         description: "true = rédige sans écrire de fichier ni pousser"
         type: boolean
         default: false
+      illustrer:
+        description: "true = cherche une image pour les articles qui n'en ont pas (sans nouvelle actu)"
+        type: boolean
+        default: false
 
 jobs:
   actus:
@@ -57,7 +61,9 @@ jobs:
           N="${{ github.event.inputs.n || '2' }}"
           DRY=""
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY="--dry-run"; fi
-          node scripts/actus-autopilote.mjs --n="$N" $DRY
+          ILL=""
+          if [ "${{ github.event.inputs.illustrer }}" = "true" ]; then ILL="--illustrer"; fi
+          node scripts/actus-autopilote.mjs --n="$N" $DRY $ILL
 
       - name: Commit et push (si de nouveaux articles)
         if: github.event.inputs.dry_run != 'true'
