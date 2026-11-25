@@ -18,14 +18,16 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
-  if (post)
-    return pageMetadata({
+  if (post) {
+    const meta = pageMetadata({
       title: post.title,
       description: post.description,
       path: `/${post.slug}/`,
       type: "article",
       image: resolveCoverImage(post).src,
     });
+    return post.noindex ? { ...meta, robots: { index: false, follow: true } } : meta;
+  }
   const hub = getHubBySlug(slug);
   if (hub)
     return pageMetadata({

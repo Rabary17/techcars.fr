@@ -12,7 +12,7 @@ export const dynamic = "force-static";
 // article ne sont pas listées : elles affichent un message « bientôt » et ne
 // doivent pas entrer dans l'index.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getAllPosts().filter((p) => p.locale === "fr");
+  const posts = getAllPosts().filter((p) => p.locale === "fr" && !p.noindex);
   const hubs = getAllHubs().filter((h) => h.locale === "fr");
   const rubriques = CATEGORIES.filter((c) => posts.some((p) => p.category === c.slug));
 

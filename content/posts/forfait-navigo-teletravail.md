@@ -8,6 +8,7 @@ wp_id: 1385
 wp_locale: "fr"
 image: "/images/articles/forfait-navigo-teletravail-couverture.webp"
 imageAlt: "Forfait Navigo télétravail : remboursement, règles et alternatives en 2026"
+noindex: true
 ---
 ***Vous télétravaillez plusieurs jours par semaine mais gardez votre abonnement Navigo ? Votre employeur doit toujours vous rembourser une partie de son coût, quel que soit votre nombre de jours de présence au bureau.***
 

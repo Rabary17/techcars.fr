@@ -8,6 +8,7 @@ wp_id: 1360
 wp_locale: "fr"
 image: "/images/articles/ter-abonnement-travail-couverture.webp"
 imageAlt: "TER abonnement travail : prix, remboursement employeur et régions éligibles"
+noindex: true
 ---
 
 ***Prendre le TER pour aller travailler ouvre droit à un remboursement obligatoire de votre employeur.*** _50 % du prix dans le secteur privé, 75 % dans le public. Ce coup de pouce se cumule avec le Forfait Mobilités Durables si vous combinez train et covoiturage. Voici les tarifs 2026, les régions concernées et la marche à suivre._

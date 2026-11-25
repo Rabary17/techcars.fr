@@ -24,6 +24,8 @@ export type Post = {
   imageAlt?: string;
   wpId?: number;
   locale: "fr" | "en";
+  /** Page hors thématique : exclue de l'index (noindex) et du sitemap. */
+  noindex?: boolean;
   contentHtml: string;
 };
 
@@ -66,6 +68,7 @@ function versPost(slug: string, data: Record<string, unknown>, contentHtml: stri
     imageAlt: data.imageAlt ? String(data.imageAlt) : undefined,
     wpId: data.wp_id ? Number(data.wp_id) : undefined,
     locale: data.wp_locale === "en" ? "en" : "fr",
+    noindex: data.noindex === true ? true : undefined,
     contentHtml,
   };
 }

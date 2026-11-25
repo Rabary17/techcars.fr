@@ -231,6 +231,7 @@ const PROMPT_REDACTION = `Tu rédiges une brève d'actualité automobile/mobilit
 Réponds UNIQUEMENT par un JSON : {"title": "...", "description": "...", "body": "...", "requete_image": "..."}
 - requete_image : 2 à 4 mots-clés pour chercher une photo libre illustrant le sujet (ex. « borne recharge voiture électrique »), sans nom de marque ni de personne.
 - body : paragraphes en Markdown séparés par une ligne vide. 250 à 350 mots. Pas de liste, pas de tableau, pas d'image, pas de lien, pas de titre.
+- Mets en **gras** les mots et chiffres importants : au moins 2 passages en gras. Commence par une phrase d'ouverture qui répond directement à la question précise du lecteur (longue traîne).
 - Factuel, phrases courtes. INTERDIT d'inventer un fait, un chiffre, un nom ou une citation absent du texte source.
 - Cite le média source dans le texte (ex. « selon Caradisiac »).
 - Jamais de tiret cadratin (—).
@@ -251,6 +252,7 @@ function controler(contenu, source) {
   if (motsDans(contenu.body) > MAX_MOTS) echecs.push(`trop long (${motsDans(contenu.body)} mots)`);
   if (/—/.test(contenu.body + contenu.title)) echecs.push("tiret cadratin");
   if (/\]\(|https?:\/\//.test(contenu.body)) echecs.push("lien dans le corps");
+  if ((contenu.body.match(/\*\*[^*\n]+\*\*/g) || []).length < 2) echecs.push("moins de 2 passages en gras");
   if (!contenu.title || contenu.title.length > 65) echecs.push("titre hors bornes");
   if (!contenu.description || contenu.description.length < 100 || contenu.description.length > 165) echecs.push("description hors bornes");
   const inventes = chiffresInventes(contenu.body, source);

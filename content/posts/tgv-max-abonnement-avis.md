@@ -8,6 +8,7 @@ wp_id: 1371
 wp_locale: "fr"
 image: "/images/articles/tgv-max-abonnement-avis-couverture.webp"
 imageAlt: "TGV Max : l'abonnement qui change (vraiment) la donne pour les voyageurs fréquents"
+noindex: true
 ---
 
 ***L'abonnement historiquement connu sous le nom de TGV Max n'existe plus sous cette appellation.*** _La SNCF l'a scindé en deux offres à prix fixe, MAX Jeune et MAX Senior, chacune réservée à une tranche d'âge précise. Les autres voyageurs dépendent d'une formule à quota, MAX Actif, au prix bien plus élevé qu'un simple 79 € par mois. Voici ce qui a vraiment changé._

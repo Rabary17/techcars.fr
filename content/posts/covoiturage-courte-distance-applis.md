@@ -9,6 +9,7 @@ wp_id: 1356
 wp_locale: "fr"
 image: "/images/articles/covoiturage-courte-distance-applis-couverture.webp"
 imageAlt: "Covoiturage courte distance : quelles applis pour des trajets du quotidien ?"
+noindex: true
 ---
 ***Un trajet de 5 km pour aller au travail, une course en périphérie, une sortie entre amis : le covoiturage courte distance réduit vos frais d'essence sans nécessiter de longue planification.***
 

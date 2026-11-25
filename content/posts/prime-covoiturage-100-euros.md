@@ -9,6 +9,7 @@ wp_id: 1341
 wp_locale: "fr"
 image: "/images/articles/prime-covoiturage-100-euros-couverture.webp"
 imageAlt: "Prime covoiturage 100 euros : comment en profiter en 2026 ?"
+noindex: true
 ---
 ***La prime nationale de 100 € pour un premier trajet en covoiturage n'existe plus depuis le 1er janvier 2025. Beaucoup de conducteurs continuent pourtant à la chercher en ligne, parfois sur la foi d'informations obsolètes.***
 

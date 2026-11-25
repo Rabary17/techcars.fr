@@ -8,6 +8,7 @@ wp_id: 1735
 wp_locale: "fr"
 image: "/images/articles/velo-pliant-train-comparatif-couverture.webp"
 imageAlt: "Vélo pliant et train : le comparatif malin pour voyager léger en 2026"
+noindex: true
 ---
 ***Un vélo pliant voyage comme un bagage à main dans la plupart des trains SNCF, à condition de rester sous 90 x 130 x 50 cm une fois plié. Tous les modèles ne se valent pas pour autant.***
 

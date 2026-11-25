@@ -8,6 +8,7 @@ wp_id: 1307
 wp_locale: "fr"
 image: "/images/articles/taxi-conventionne-cpam-couverture.webp"
 imageAlt: "Taxi conventionné CPAM : remboursement, prix et conditions en 2026"
+noindex: true
 ---
 
 ***Un trajet médical en taxi conventionné ouvre droit à un remboursement de 55 % par la CPAM, 100 % dans certains cas.*** _Une franchise de 4 € par trajet reste à votre charge. Depuis la nouvelle convention nationale entrée en vigueur en 2025, la tarification a changé : voici ce qui se passe vraiment en 2026._
