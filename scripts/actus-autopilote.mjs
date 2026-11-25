@@ -12,10 +12,11 @@
 //   SHEETS_SERVICE_ACCOUNT_JSON  compte de service Google (éditeur du sheet)
 //   VEILLE_SHEET_ID              identifiant du sheet (défaut ci-dessous)
 //   CLAUDE_CODE_OAUTH_TOKEN      tri et rédaction (CLI Claude Code, abonnement)
+//   UNSPLASH_ACCESS_KEY, PEXELS_API_KEY, PIXABAY_API_KEY   images libres (facultatives)
 
-import { spawnSync } from "node:child_process";
 import { createSign } from "node:crypto";
-import { existsSync, writeFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -159,40 +160,76 @@ async function texteSource(url) {
     .filter((p) => p.length >= 80 && p.length <= 800);
   const texte = paras.join("\n\n").slice(0, 6000);
   if (texte.length < 200) throw new Error("texte source trop court (paywall ou page dynamique)");
-  // Image à la une de la page source (og:image, sinon twitter:image)
-  const meta =
-    html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]*content=["']([^"']+)["']/i) ||
-    html.match(/<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["'](?:og:image|twitter:image)["']/i);
-  let image = null;
-  if (meta) {
-    try { image = new URL(decoder(meta[1]), url).href; } catch { image = null; }
-  }
-  return { texte, image };
+  return texte;
 }
 
-// Télécharge l'image de la source dans public/images/articles/ et renvoie son chemin web.
-async function telechargerImage(imageUrl, slug) {
-  if (!imageUrl) return null;
-  try {
-    const res = await fetch(imageUrl, { headers: { "User-Agent": "Mozilla/5.0 (compatible; techcars-actus/1.0)" }, redirect: "follow" });
-    if (!res.ok) return null;
-    const type = (res.headers.get("content-type") || "").split(";")[0].trim();
-    const ext = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" }[type];
-    if (!ext) return null;
-    const octets = Buffer.from(await res.arrayBuffer());
-    if (octets.length < 5000 || octets.length > 5 * 1024 * 1024) return null;
-    const nom = `${slug}.${ext}`;
-    if (!DRY) writeFileSync(join(ROOT, "public", "images", "articles", nom), octets);
-    return `/images/articles/${nom}`;
-  } catch {
-    return null;
+// ---------- Images libres de droit (même méthode que techno-play) ----------
+// Unsplash, puis Pexels, puis Pixabay : on prend le premier résultat non encore utilisé.
+// L'URL distante est enregistrée dans le frontmatter ; rien n'est téléchargé.
+
+async function chercherUnsplash(requete) {
+  const cle = process.env.UNSPLASH_ACCESS_KEY;
+  if (!cle) return [];
+  const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(requete)}&per_page=10&orientation=landscape`, {
+    headers: { Authorization: `Client-ID ${cle}` },
+  });
+  if (!res.ok) return [];
+  const json = await res.json();
+  return (json.results || []).map((r) => ({ url: r.urls.regular, alt: r.alt_description || "" }));
+}
+
+async function chercherPexels(requete) {
+  const cle = process.env.PEXELS_API_KEY;
+  if (!cle) return [];
+  const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(requete)}&per_page=10&orientation=landscape`, {
+    headers: { Authorization: cle },
+  });
+  if (!res.ok) return [];
+  const json = await res.json();
+  return (json.photos || []).map((p) => ({ url: p.src.large, alt: p.alt || "" }));
+}
+
+async function chercherPixabay(requete) {
+  const cle = process.env.PIXABAY_API_KEY;
+  if (!cle) return [];
+  const res = await fetch(`https://pixabay.com/api/?key=${encodeURIComponent(cle)}&q=${encodeURIComponent(requete)}&image_type=photo&orientation=horizontal&per_page=10&safesearch=true`);
+  if (!res.ok) return [];
+  const json = await res.json();
+  return (json.hits || []).map((h) => ({ url: h.largeImageURL, alt: h.tags || "" }));
+}
+
+async function trouverImage(requete, dejaUtilisees) {
+  const texte = (requete || "").trim();
+  if (!texte) return null;
+  let premier = null;
+  for (const chercher of [chercherUnsplash, chercherPexels, chercherPixabay]) {
+    try {
+      const resultats = await chercher(texte);
+      if (resultats.length && !premier) premier = resultats[0];
+      const libre = resultats.find((r) => !dejaUtilisees.has(r.url));
+      if (libre) return libre;
+    } catch (e) {
+      log(`  recherche image échouée : ${e.message}`);
+    }
   }
+  return premier;
+}
+
+// Images déjà présentes dans les articles, pour ne pas reprendre la même photo.
+function imagesDejaUtilisees() {
+  const urls = new Set();
+  for (const f of readdirSync(POSTS_DIR).filter((f) => f.endsWith(".md"))) {
+    const m = readFileSync(join(POSTS_DIR, f), "utf8").match(/^image:\s*"([^"]+)"/m);
+    if (m) urls.add(m[1]);
+  }
+  return urls;
 }
 
 // ---------- Rédaction + garde-fous ----------
 
 const PROMPT_REDACTION = `Tu rédiges une brève d'actualité automobile/mobilité pour techcars.fr, à partir du texte RÉEL fourni.
-Réponds UNIQUEMENT par un JSON : {"title": "...", "description": "...", "body": "..."}
+Réponds UNIQUEMENT par un JSON : {"title": "...", "description": "...", "body": "...", "requete_image": "..."}
+- requete_image : 2 à 4 mots-clés pour chercher une photo libre illustrant le sujet (ex. « borne recharge voiture électrique »), sans nom de marque ni de personne.
 - body : paragraphes en Markdown séparés par une ligne vide. 250 à 350 mots. Pas de liste, pas de tableau, pas d'image, pas de lien, pas de titre.
 - Factuel, phrases courtes. INTERDIT d'inventer un fait, un chiffre, un nom ou une citation absent du texte source.
 - Cite le média source dans le texte (ex. « selon Caradisiac »).
@@ -238,7 +275,8 @@ async function ecrireArticle(contenu, source) {
   const slug = slugify(contenu.title);
   const chemin = join(POSTS_DIR, `${slug}.md`);
   if (existsSync(chemin)) return { slug, chemin, existait: true };
-  const image = (await telechargerImage(source.image, slug)) || IMAGE_PAR_DEFAUT;
+  const trouvee = await trouverImage(contenu.requete_image, imagesDejaUtilisees());
+  const image = trouvee ? trouvee.url : IMAGE_PAR_DEFAUT;
   const fm = [
     "---",
     `title: ${JSON.stringify(contenu.title)}`,
@@ -283,8 +321,7 @@ async function main() {
     }
     let source;
     try {
-      const page = await texteSource(actu.url);
-      source = { url: actu.url, texte: page.texte, image: page.image };
+      source = { url: actu.url, texte: await texteSource(actu.url) };
     } catch (e) {
       log(`  source non exploitable : ${e.message}`);
       await marquerStatut(jeton, actu.ligne, `Écarté (source : ${e.message.slice(0, 120)})`);
