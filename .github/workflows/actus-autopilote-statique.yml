@@ -58,6 +58,9 @@ jobs:
 
       - name: Commit et push (si de nouveaux articles)
         if: github.event.inputs.dry_run != 'true'
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ secrets.GSC_SITE_URL }}
         run: |
           git config user.name "actus-autopilote[bot]"
           git config user.email "actus-autopilote@techcars.fr"
@@ -67,4 +70,7 @@ jobs:
           else
             git commit -m "feat(actus): autopilote, nouveaux articles d'actualité"
             git push origin HEAD:${{ github.ref_name }}
+            # Indexation : IndexNow (Bing) + sitemap soumis à Google Search Console
+            NOUVELLES_URLS=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- content/posts | sed -E 's#^content/posts/(.*)\.md$#https://techcars.fr/\1/#')
+            NOUVELLES_URLS="$NOUVELLES_URLS" node scripts/indexation/submit.mjs
           fi

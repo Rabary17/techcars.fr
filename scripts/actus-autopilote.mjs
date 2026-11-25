@@ -29,6 +29,7 @@ const MODELE_REDACTION = "claude-sonnet-5-5";
 const MAX_MOTS = 400;
 const AUTEUR = "thomas-lefevre"; // persona des actus générales (lib/authors.ts)
 const RUBRIQUE = "actualites"; // slug de lib/categories.ts
+const IMAGE_PAR_DEFAUT = "/images/articles/default-actualites.svg"; // si la source n'a pas d'image
 
 const args = process.argv.slice(2);
 const N = Number((args.find((a) => a.startsWith("--n=")) || "--n=2").split("=")[1]);
@@ -158,7 +159,34 @@ async function texteSource(url) {
     .filter((p) => p.length >= 80 && p.length <= 800);
   const texte = paras.join("\n\n").slice(0, 6000);
   if (texte.length < 200) throw new Error("texte source trop court (paywall ou page dynamique)");
-  return texte;
+  // Image à la une de la page source (og:image, sinon twitter:image)
+  const meta =
+    html.match(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]*content=["']([^"']+)["']/i) ||
+    html.match(/<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["'](?:og:image|twitter:image)["']/i);
+  let image = null;
+  if (meta) {
+    try { image = new URL(decoder(meta[1]), url).href; } catch { image = null; }
+  }
+  return { texte, image };
+}
+
+// Télécharge l'image de la source dans public/images/articles/ et renvoie son chemin web.
+async function telechargerImage(imageUrl, slug) {
+  if (!imageUrl) return null;
+  try {
+    const res = await fetch(imageUrl, { headers: { "User-Agent": "Mozilla/5.0 (compatible; techcars-actus/1.0)" }, redirect: "follow" });
+    if (!res.ok) return null;
+    const type = (res.headers.get("content-type") || "").split(";")[0].trim();
+    const ext = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" }[type];
+    if (!ext) return null;
+    const octets = Buffer.from(await res.arrayBuffer());
+    if (octets.length < 5000 || octets.length > 5 * 1024 * 1024) return null;
+    const nom = `${slug}.${ext}`;
+    if (!DRY) writeFileSync(join(ROOT, "public", "images", "articles", nom), octets);
+    return `/images/articles/${nom}`;
+  } catch {
+    return null;
+  }
 }
 
 // ---------- Rédaction + garde-fous ----------
@@ -205,11 +233,12 @@ function slugify(s) {
     .slice(0, 90);
 }
 
-function ecrireArticle(contenu, source) {
+async function ecrireArticle(contenu, source) {
   const date = new Date().toISOString().slice(0, 10);
   const slug = slugify(contenu.title);
   const chemin = join(POSTS_DIR, `${slug}.md`);
   if (existsSync(chemin)) return { slug, chemin, existait: true };
+  const image = (await telechargerImage(source.image, slug)) || IMAGE_PAR_DEFAUT;
   const fm = [
     "---",
     `title: ${JSON.stringify(contenu.title)}`,
@@ -219,6 +248,8 @@ function ecrireArticle(contenu, source) {
     `category: "${RUBRIQUE}"`,
     `wp_locale: "fr"`,
     `source: ${JSON.stringify(source.url)}`,
+    `image: "${image}"`,
+    `imageAlt: ${JSON.stringify(contenu.title)}`,
     "---",
     "",
     contenu.body.trim(),
@@ -252,7 +283,8 @@ async function main() {
     }
     let source;
     try {
-      source = { url: actu.url, texte: await texteSource(actu.url) };
+      const page = await texteSource(actu.url);
+      source = { url: actu.url, texte: page.texte, image: page.image };
     } catch (e) {
       log(`  source non exploitable : ${e.message}`);
       await marquerStatut(jeton, actu.ligne, `Écarté (source : ${e.message.slice(0, 120)})`);
@@ -272,7 +304,7 @@ async function main() {
       await marquerStatut(jeton, actu.ligne, `Écarté (garde-fou : ${echecs.join(", ").slice(0, 150)})`);
       continue;
     }
-    const article = ecrireArticle(contenu, source);
+    const article = await ecrireArticle(contenu, source);
     if (article.existait) {
       log(`  déjà présent : ${article.slug}`);
       continue;
