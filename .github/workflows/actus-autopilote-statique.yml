@@ -21,6 +21,10 @@ on:
       n:
         description: "Nombre d'articles à écrire"
         default: "2"
+      fond:
+        description: "true = force un article de fond ce jour-là (sinon : un jour sur deux)"
+        type: boolean
+        default: false
       dry_run:
         description: "true = rédige sans écrire de fichier ni pousser"
         type: boolean
@@ -58,6 +62,18 @@ jobs:
           DRY=""
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY="--dry-run"; fi
           node scripts/actus-autopilote.mjs --n="$N" $DRY
+
+      - name: Article de fond (un jour sur deux)
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          FOND_FORCE: ${{ github.event.inputs.fond }}
+        run: node scripts/fond-autopilote.mjs
 
       - name: Images uniques (corriger les doublons)
         if: github.event.inputs.dry_run != 'true'
