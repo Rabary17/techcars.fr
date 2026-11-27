@@ -7,8 +7,8 @@ author: "julien-fabre"
 category: "moteurs-hybrides"
 wp_id: 2044
 wp_locale: "en"
-image: "/images/articles/hybride-leger-ou-rechargeable-couverture.jpg"
-imageAlt: "Light hybrid or plug-in hybrid: charging, cost and upkeep compared"
+image: "https://images.unsplash.com/photo-1565049981953-379c9c2a5d48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwxfHxsaWdodCUyMGh5YnJpZCUyMHBsdWd8ZW58MHwwfHx8MTc5NTc5NjI2Nnww&ixlib=rb-4.1.0&q=80&w=1080"
+imageAlt: "black male plug in front of electric socket"
 ---
 ***A mild hybrid never plugs in, while a plug-in hybrid can drive several kilometres without a drop of petrol. Behind these two labels sit two different philosophies, two maintenance routines and two very different budgets day to day.***
 

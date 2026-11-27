@@ -7,8 +7,8 @@ author: "julien-fabre"
 category: "moteurs-electriques"
 wp_id: 2045
 wp_locale: "en"
-image: "/images/articles/batterie-lfp-ou-nmc-ce-qui-change-couverture.jpg"
-imageAlt: "LFP or NMC battery: differences in price, range and charging"
+image: "https://images.pexels.com/photos/36594160/pexels-photo-36594160.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+imageAlt: "A worker checking many industrial batteries inside a facility. Indoor, industrial setting."
 ---
 ***Two chemistries dominate electric car batteries, LFP and NMC. They age differently and don't call for the same charging habits.***
 

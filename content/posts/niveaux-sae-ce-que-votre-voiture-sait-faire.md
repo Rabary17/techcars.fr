@@ -6,7 +6,8 @@ updated: "2026-11-23"
 author: "thomas-lefevre"
 wp_id: 2043
 wp_locale: "fr"
-image: "/images/articles/niveaux-sae-ce-que-votre-voiture-sait-faire-couverture.jpg"
+image: "https://images.pexels.com/photos/38153291/pexels-photo-38153291.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+imageAlt: "A wild sea otter resting on a bed of green algae in California's coastal environment."
 ---
 Sur une fiche produit, « conduite autonome » peut vouloir dire beaucoup de choses. Sur la route, la différence se joue dans un détail simple, qui surveille la route, vous ou le système. La norme **SAE J3016** répond à cette question avec six niveaux, du niveau 0 au niveau 5.
 

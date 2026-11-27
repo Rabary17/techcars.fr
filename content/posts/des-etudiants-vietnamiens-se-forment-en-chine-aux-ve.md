@@ -6,6 +6,8 @@ author: "thomas-lefevre"
 category: "actualites"
 wp_locale: "fr"
 source: "https://www.vietnam.vn/fr/sinh-vien-truong-nghe-sang-trung-quoc-hoc-ve-xe-nang-luong-moi"
+image: "https://images.unsplash.com/photo-1529304344766-6b537de190f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwxfHxldHVkaWFudHMlMjB2aWV0bmFtaWVucyUyMGZvcm1lbnR8ZW58MHwwfHx8MTc5NTc5NjI2MXww&ixlib=rb-4.1.0&q=80&w=1080"
+imageAlt: "woman carrying basket on her shoulder"
 ---
 
 Un groupe d'étudiants du Ho Chi Minh City International College a participé à un programme d'échange de deux semaines sur les technologies automobiles à énergies nouvelles. Il s'est tenu à l'Académie d'ingénierie des transports du Guangxi, en Chine, de fin octobre à mi-novembre 2026.

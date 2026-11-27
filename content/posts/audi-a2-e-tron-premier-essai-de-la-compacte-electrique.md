@@ -6,6 +6,8 @@ author: "thomas-lefevre"
 category: "actualites"
 wp_locale: "fr"
 source: "https://www.largus.fr/actualite-automobile/essai-audi-a2-e-tron-2026-nouveau-plan-de-volt-40017430.html"
+image: "https://images.unsplash.com/photo-1622701579527-dcd1bb5fbb9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwxfHxhdWRpJTIwdHJvbiUyMHByZW1pZXJ8ZW58MHwwfHx8MTc5NTc5NjI2MXww&ixlib=rb-4.1.0&q=80&w=1080"
+imageAlt: "black car with white license plate"
 ---
 
 L'Audi A2 e-tron devient la nouvelle porte d'entrée électrique de la marque, alors qu'il fallait jusqu'ici viser au minimum le SUV Q4. Selon le média à l'origine de cet essai, Audi s'est servie dans le catalogue du groupe Volkswagen : plate-forme MEB, déjà utilisée par l'ID.3 Neo et la Cupra Born, et moteur APP350 vu sur le Q4 e-tron.

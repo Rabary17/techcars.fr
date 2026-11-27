@@ -6,8 +6,8 @@ author: "thomas-lefevre"
 category: "actualites"
 wp_locale: "fr"
 source: "https://www.sudouest.fr/economie/auto-moto/voiture-electrique-usage-autonomie-consommation-sur-quels-criteres-la-choisir-31472878.php"
-image: "https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwxfHx2b2l0dXJlJTIwJUMzJUE5bGVjdHJpcXVlJTIwcmVjaGFyZ2V8ZW58MHwwfHx8MTc5NTcxMDYzMXww&ixlib=rb-4.1.0&q=80&w=1080"
-imageAlt: "Voiture électrique : les critères de choix selon l'Ademe"
+image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwyfHx2b2l0dXJlJTIwZWxlY3RyaXF1ZSUyMGNyaXRlcmVzfGVufDB8MHx8fDE3OTU3OTYyNjV8MA&ixlib=rb-4.1.0&q=80&w=1080"
+imageAlt: "electric vehicle charger plugged into car"
 ---
 
 Pour bien choisir sa voiture électrique, il faut d'abord partir de son **usage réel**, puis regarder la **consommation** et la **puissance de recharge**. C'est ce que recommande un avis de l'Ademe publié en octobre 2026, relayé par The Conversation.

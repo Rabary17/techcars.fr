@@ -6,8 +6,8 @@ author: "thomas-lefevre"
 category: "actualites"
 wp_locale: "fr"
 source: "https://www.autoplus.fr/environnement/voiture-electrique/byd-tang-une-nouvelle-generation-aux-dents-tres-longues-1477247.html"
-image: "https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwxfHxTVVYlMjAlQzMlQTlsZWN0cmlxdWUlMjByZWNoYXJnZSUyMHJhcGlkZXxlbnwwfDB8fHwxNzk1NzEwNjYxfDA&ixlib=rb-4.1.0&q=80&w=1080"
-imageAlt: "BYD Tang : la 3e génération recharge en 5 minutes"
+image: "https://images.unsplash.com/photo-1694027651012-cb09072e252e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwxfHxieWQlMjB0YW5nJTIwZ2VuZXJhdGlvbnxlbnwwfDB8fHwxNzk1Nzk2MjY0fDA&ixlib=rb-4.1.0&q=80&w=1080"
+imageAlt: "a close up of the front of a blue and white car"
 ---
 
 Le nouveau BYD Tang revendique une recharge de **10 à 70 % en cinq minutes environ**, selon Caradisiac. Cette troisième génération du grand SUV chinois arrive avec un positionnement plus haut de gamme que jamais. L'Europe n'est pas encore au programme.

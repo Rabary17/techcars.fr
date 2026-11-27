@@ -6,7 +6,8 @@ updated: "2026-11-23"
 author: "julien-fabre"
 wp_id: 2046
 wp_locale: "en"
-image: "/images/articles/freinage-automatique-ce-que-la-regle-impose-2026-couverture.jpg"
+image: "https://images.unsplash.com/photo-1715079166936-1577f93c44fc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5NTE4NzJ8MHwxfHNlYXJjaHwxfHxhdXRvbWF0aWMlMjBicmFraW5nJTIwd2hhdHxlbnwwfDB8fHwxNzk1Nzk2MjYyfDA&ixlib=rb-4.1.0&q=80&w=1080"
+imageAlt: "a parking brake pull sign with a red light"
 ---
 ***Braking that triggers on its own is first a safety matter. It is also a practical one: what does the system do, when does it act, and what is still your job?*** The European regulation known as GSR2 (General Safety Regulation 2) now sets a precise framework for new cars, rolled out over several years.
 
