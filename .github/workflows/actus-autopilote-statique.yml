@@ -59,6 +59,14 @@ jobs:
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY="--dry-run"; fi
           node scripts/actus-autopilote.mjs --n="$N" $DRY
 
+      - name: Images uniques (corriger les doublons)
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+        run: node scripts/images/corriger-doublons.mjs
+
       - name: Commit et push (si de nouveaux articles)
         if: github.event.inputs.dry_run != 'true'
         env:
@@ -77,3 +85,7 @@ jobs:
             NOUVELLES_URLS=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- content/posts | sed -E 's#^content/posts/(.*)\.md$#https://techcars.fr/\1/#')
             NOUVELLES_URLS="$NOUVELLES_URLS" node scripts/indexation/submit.mjs
           fi
+
+      - name: Vérifier les images (une photo par article)
+        if: github.event.inputs.dry_run != 'true'
+        run: node scripts/images/verifier-images.mjs

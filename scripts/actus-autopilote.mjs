@@ -16,6 +16,8 @@
 
 import { createSign } from "node:crypto";
 import { spawnSync } from "node:child_process";
+import { rechercherImage } from "./images/recherche.mjs";
+import * as unicite from "./images/unicite.mjs";
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -163,66 +165,16 @@ async function texteSource(url) {
   return texte;
 }
 
-// ---------- Images libres de droit (même méthode que techno-play) ----------
-// Unsplash, puis Pexels, puis Pixabay : on prend le premier résultat non encore utilisé.
-// L'URL distante est enregistrée dans le frontmatter ; rien n'est téléchargé.
+// ---------- Images libres de droit : une photo par site, jamais de repli ----------
+// Règles strictes (voir scripts/images/) : une même photo ne sert qu'une fois sur le
+// site ; si aucune photo libre n'est trouvée, l'article garde l'image par défaut.
 
-async function chercherUnsplash(requete) {
-  const cle = process.env.UNSPLASH_ACCESS_KEY;
-  if (!cle) return [];
-  const res = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(requete)}&per_page=10&orientation=landscape`, {
-    headers: { Authorization: `Client-ID ${cle}` },
-  });
-  if (!res.ok) return [];
-  const json = await res.json();
-  return (json.results || []).map((r) => ({ url: r.urls.regular, alt: r.alt_description || "" }));
-}
-
-async function chercherPexels(requete) {
-  const cle = process.env.PEXELS_API_KEY;
-  if (!cle) return [];
-  const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(requete)}&per_page=10&orientation=landscape`, {
-    headers: { Authorization: cle },
-  });
-  if (!res.ok) return [];
-  const json = await res.json();
-  return (json.photos || []).map((p) => ({ url: p.src.large, alt: p.alt || "" }));
-}
-
-async function chercherPixabay(requete) {
-  const cle = process.env.PIXABAY_API_KEY;
-  if (!cle) return [];
-  const res = await fetch(`https://pixabay.com/api/?key=${encodeURIComponent(cle)}&q=${encodeURIComponent(requete)}&image_type=photo&orientation=horizontal&per_page=10&safesearch=true`);
-  if (!res.ok) return [];
-  const json = await res.json();
-  return (json.hits || []).map((h) => ({ url: h.largeImageURL, alt: h.tags || "" }));
-}
-
-async function trouverImage(requete, dejaUtilisees) {
-  const texte = (requete || "").trim();
-  if (!texte) return null;
-  let premier = null;
-  for (const chercher of [chercherUnsplash, chercherPexels, chercherPixabay]) {
-    try {
-      const resultats = await chercher(texte);
-      if (resultats.length && !premier) premier = resultats[0];
-      const libre = resultats.find((r) => !dejaUtilisees.has(r.url));
-      if (libre) return libre;
-    } catch (e) {
-      log(`  recherche image échouée : ${e.message}`);
-    }
-  }
-  return premier;
-}
-
-// Images déjà présentes dans les articles, pour ne pas reprendre la même photo.
-function imagesDejaUtilisees() {
-  const urls = new Set();
-  for (const f of readdirSync(POSTS_DIR).filter((f) => f.endsWith(".md"))) {
-    const m = readFileSync(join(POSTS_DIR, f), "utf8").match(/^image:\s*"([^"]+)"/m);
-    if (m) urls.add(m[1]);
-  }
-  return urls;
+async function trouverImage(requete, titre) {
+  return unicite.choisirImageUnique(
+    unicite.requetesImage({ keyword: requete, titre }),
+    rechercherImage,
+    unicite.idsUtilisees(POSTS_DIR)
+  );
 }
 
 // ---------- Rédaction + garde-fous ----------
@@ -277,7 +229,7 @@ async function ecrireArticle(contenu, source) {
   const slug = slugify(contenu.title);
   const chemin = join(POSTS_DIR, `${slug}.md`);
   if (existsSync(chemin)) return { slug, chemin, existait: true };
-  const trouvee = await trouverImage(contenu.requete_image, imagesDejaUtilisees());
+  const trouvee = await trouverImage(contenu.requete_image, contenu.title);
   const image = trouvee ? trouvee.url : IMAGE_PAR_DEFAUT;
   const fm = [
     "---",
